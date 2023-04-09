@@ -1,28 +1,33 @@
-import React, {useState} from 'react';
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-import Login from "./components/login/Login";
-import Register from "./components/register/Register";
-import Home from "./components/Home/Home";
+import Login from "./components/pages/Login/Login";
+import Register from "./components/pages/Register/Register";
+import Home from "./components/pages/Home/Home";
+import Admin from './components/pages/admin/Admin';
+import AccountManagement from './components/pages/admin/AccountManagement';
+import NewsDetail from './components/pages/Home/newsDetail/NewsDetail';
 
+import { dummyDataNews } from './components/dummyData/dummyData';
 function App() {
-  const [currentForm, setcurrentForm] = useState('login');
-  const toggleForm = (formName) =>{
-    setcurrentForm(formName);
-  }
+  const newsList = [...dummyDataNews];
+  const isLogin = !!localStorage.getItem('access-token');
+  
   return (
-    // <div className="App">
-    // {
-    //     currentForm === "login" ?<Login onFormSwith= {toggleForm}/>:<Register onFormSwith= {toggleForm}/>
-    // }
-      
-    // </div>
-    <Router classname = "app">
+    <Router className = "app">
         <Routes>
-        <Route path="/" element={<Login/>}/>
-        <Route path="/register" element={<Register/>}/> 
-        <Route path='/Home' element={<Home/>}/>
+          <Route path="/" element={<Login/>}/>
+          <Route path="/register" element={<Register/>}/> 
+          <Route path='/home' element={ <Home/>}/>
+          <Route path='/admin/news' element={isLogin ? <Admin/> : <Navigate to='/'/>}/>
+          <Route path='/admin/users' element={isLogin ? <AccountManagement/> : <Navigate to='/'/>}/>
+          {newsList.map((news, index) => 
+            <Route key={index} path={`/news/${news.id}`} element={ 
+              isLogin ? <NewsDetail news={news} /> : <Navigate to='/'/>
+            }></Route>
+          )}
         </Routes>
     </Router>
   );
